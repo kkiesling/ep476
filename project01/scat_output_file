@@ -1,0 +1,9 @@
+  Enter the background number density. (10**18 m^-3)
+  Enter the background temperature. (eV)
+  Enter the speed of the test particle. (m/s)
+
+                     Test-Particle Rates (s**-1)
+                     ---------------------------
+          Slowing  Transverse diff    Parallel diff      Energy loss
+  0.327728463E+06  0.461168116E+12  0.230569101E+12 -0.691736562E+12
+

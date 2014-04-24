@@ -1,0 +1,74 @@
+#!/bin/bash
+#
+# This script moves files and directories specified by the argument
+# list into a directory called trash_dir in the user's home directory.
+# If trash_dir does not exist, create it first.  Also, check if the
+# file or directory being moved already exists in trash_dir.  If so,
+# add a suffix to the name until it doesn't match the contents of
+# trash_dir when being moved.
+
+# This function appends ".1" to its first argument and puts the result
+# in the NEWNAME variable.
+
+addsuf () { NEWNAME="$1.1" ; }
+
+# Check whether trash_dir exists in your home directory.
+
+TRASHPATH=$HOME/trash_dir
+
+if [ ! -d $TRASHPATH ] 
+then
+  if mkdir $TRASHPATH                    #    mkdir returns a 0 if
+  then                                   #    trash_dir has been created.
+    echo '** trash_dir created **'
+  else
+    echo '** trash script unable to create trash_dir **' 
+    exit
+  fi
+fi
+
+# Confirm that trash_dir is writeable and make it so if it isn't.
+
+if [ -w $TRASHPATH ]
+then
+  echo '** trash_dir is already writeable **'
+else
+  if chmod u+w $TRASHPATH
+  then
+    echo '** trash_dir is now writeable **'
+  else
+    echo '** trash script unable to make trash_dir writeable **'
+  fi
+fi
+
+# Loop through the argument list, moving the files or directories
+# to trash_dir after checking for files of the same name in trash_dir.
+# If the name is a duplicate, use the addsuf function until the name
+# is unique.
+
+for DISCARD in $@
+do
+  TRASHNAME=$DISCARD
+  while [ -e $TRASHPATH/$TRASHNAME ]
+  do
+    addsuf $TRASHNAME
+    TRASHNAME=$NEWNAME
+  done
+
+# Move the file to trash_dir with its new name if it gets changed.
+# Alert the user of the success of the move and the name the file
+# now has in trash_dir.
+
+  if mv $DISCARD $TRASHPATH/$TRASHNAME
+  then
+    if [ -d $DISCARD ]
+    then
+      echo "Directory $DISCARD has been moved to $TRASHPATH/$TRASHNAME."
+    else
+      echo "File $DISCARD has been moved to $TRASHPATH/$TRASHNAME."
+    fi
+  else
+    echo "** trash script unable to move $DISCARD to trash_dir **"
+  fi
+done
+

@@ -1,0 +1,14 @@
+printf "enter filename to copy.\n"
+read FILENAME
+if [ -f $FILENAME ]
+  then
+    printf "enter new name.\n"
+    unset COPY
+    while [ -z "$COPY" ]
+    do
+      read COPY
+    done
+    cp $FILENAME $COPY
+else
+  printf "file $FILENAME does not exist .\n"
+fi

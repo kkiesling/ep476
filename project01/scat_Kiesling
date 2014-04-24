@@ -1,0 +1,210 @@
+#!/bin/bash
+
+# This script runs the scat_rate executable, scat_exec, and
+# collects data from its output.
+
+# ------------------------- #
+
+# The runscat function calls scat_exec once and then
+# processes its output from that single execution.
+
+# NOTE THAT ONE MAY USE TEMPORARY FILES AND REDIRECTED
+# I/O TO PROVIDE INPUT FOR scat_exec AND TO COLLECT
+# OUTPUT FROM THE EXECUTABLE.  HERE, scat_input_file NEEDS TO
+# BE CREATED BEFORE CALLING THE EXECUTABLE.
+# TEMPORARY FILES CAN ALSO BE USED WHILE PARSING THE OUTPUT
+# FOR THE ORGANIZATION STEP.
+
+
+runscat () {
+
+  $SCATDIR/$SCAT < scat_input_file > scat_output_file
+
+# THE FOLLOWING LOOP IS AN EXAMPLE OF PARSING USING
+# THE AWK COMMAND AND TEMPORARY FILES.  IT FINDS A LINE
+# IN THE scat_output_file FILE THAT CONTAINS "0.".
+# EACH ITERATION OF THE LOOP WILL COPY ONE OF THE
+# RATES FROM THAT LINE OF scat_output_file INTO
+# THE RATE ARRAY.  HERE, THE SMALL-CASE ind IS AN
+# AWK VARIABLE, AND THE CAPITALIZED IND IS A SHELL
+# VARIABLE USED TO SET ind.
+
+  IND=0
+  NRATE=4
+  while [ $IND -lt $NRATE ]
+  do
+    RATE[$IND]=`awk ' /0\./ {  print  $ind ; } ' ind=$(( $IND+1 )) \
+      scat_output_file`
+    IND=$(( $IND+1 ))
+  done
+
+}
+
+# ------------------------- #
+# THIS PROGRAM WILL FILL EACH FILE WITH THE APPROPRIATE TABLES.
+# TAKES FIRST INPUT AS THE NAME OF THE ARRAY TO PARSE.
+
+fill_block () {
+
+ARRAY=("${!1}")    # APPLY INPUT ARRAY TO BE USED
+
+N=$(( $ND/4 + 1 )) # FIND NUMBER OF BLOCKS NEEDED TO KEEP 4 PER LINE
+NB=0               # INITIALIZE BLOCK INDEX (0-N)
+ID=0               # INITIALIZE DENSITY INDEX 
+IND=0              # INITIALIZE INDEX FOR RATE VALUES
+
+# THIS LOOP CREATES THE BLOCKS OF 4 DENSITY VALUES AS COLUMNS AND
+# NS SPEED VALUES AS ROWS. IT THEN FILLS EACH SPOT WITH THE
+# APPROPRIATE RATE VALUE.
+
+# TEST TO BE WITHIN THE TOTAL NUMBER OF BLOCKS AND 
+# TEST THAT THAT NUMBER OF BLOCKS IS NOT EVENLY DIVISIBLE BY 4.
+while [ $NB -lt $N ] && [ $(( $ND - 4*NB )) -ne 0 ]
+do
+# PRINT OUT DENSITY VALUES AS COLUMN HEADERS FOR EACH BLOCK
+printf "%-22s" "density (10^18 m^-3)"
+  i=0
+  while [ $i -lt 4 ] && [ $ID -lt $ND ]
+  do
+  printf "%15.2e" "${D[$ID]}"
+  i=$(( $i + 1 ))
+  ID=$(( $ID + 1 ))
+  done
+printf "\n\n"
+# PRINT OUT SPEED COLUMN HEADER
+printf "%-10s\n" "speed (m/s)"
+IS=0
+  while [ $IS -lt $NS ]
+  do
+  # DISPLAY ROWS OF EACH SPEED FILLED WITH APPROPRIATE RATE VALUES
+  printf "%-22.2e" "${SPEED[$IS]}"
+    k=0
+    while [ $k -lt 4 ] && [ $(( 4*NB+k )) -lt $ND ]
+    do
+    printf "%15.4e" "${ARRAY[$IND]}"
+    k=$(( $k + 1 ))
+    IND=$(( $IND + 1 ))
+    done
+    printf "\n"
+  IS=$(( $IS+1 ))
+  done
+printf "\n"
+NB=$(( $NB + 1 ))  # INDEX TO MOVE ONTO NEXT BLOCK
+done
+
+}
+
+# ------------------------- #
+
+# Start the main program by setting path and file names
+# for the executable.
+
+SCATDIR=~csovinec/ep476/scat_rate
+SCAT=scat_exec
+
+
+# REQUEST AND READ INFORMATION FROM THE USER FOR THE DENSITY AND
+# SPEED RANGES.  NOTE THAT THE bc COMMAND MAY BE USEFUL FOR
+# PERFORMING REAL (AS OPPOSED TO INTEGER) ARITHMETIC.  THE FOLLOWING
+# EXAMPLE SETS THE DELD VARIABLE TO A RANGE ($DMAX-$DMIN)
+# DIVIDED BY THE NUMBER OF STEPS, $ND-1, USING
+# 12 DECIMAL PLACES IN THE COMPUTATIONS.
+
+# THE FOLLOWING IS TO TEST IF TEMPERATURE INPUT WAS GIVEN WHEN 
+# THE PROGRAM WAS CALLED. IF NOT, IT WILL PROMPT USER FOR INPUT 
+# AND STORE AS TEMPERATURE.
+
+if [ $# -ne 0 ]
+  then
+      TEMPERATURE=$1
+else
+      echo "Please input desired background temperature (eV)"
+      read TEMPERATURE
+fi
+
+# REQUEST INTERACTIVE INPUT FOR MIN AND MAX NUMBER DENSITIES AND
+# THE NUMBER OF INTERVALS.
+  echo "Please input number density minimum (10**18 m^-3)"
+    read DMIN
+  echo "Please input number density maximum (10**18 m^-3)"
+    read DMAX
+  echo "Please input number of density values desired"
+    read ND
+  DELD=`echo "scale=12; ($DMAX-$DMIN)/($ND-1)" | bc`
+
+# REQUEST INTERACTIVE INPUT FOR MIN AND MAX PARTICLE SPEEDS AND
+# THE NUMBER OF INTERVALS.
+  echo "Please input particle speed minimum (km/s)"
+    read SMIN_KM
+    # CONVERT INPUT FROM km/s to m/s
+    SMIN=`echo "($SMIN_KM*1000)" | bc`
+  echo "Please input particle speed maximum (km/s)"
+    read SMAX_KM
+    # CONVERT INPUT FROM km/s to m/s
+    SMAX=`echo "($SMAX_KM*1000)" | bc`
+  echo "Please input number of speed values desired"
+    read NS
+    DELS=`echo "scale=12; ($SMAX-$SMIN)/($NS-1)" | bc`
+
+
+# CODE TO LOOP OVER THE DENSITY AND SPEED VALUES WITH A CALL
+# TO runscat IS NEEDED TO COLLECT RATE INFORMATION.  
+# RUN PROGRAM FOR ALL VALUES OF NUMBER DENSITY AND SPEED
+
+
+IS=0   # INITIALIZE SPEED INDEX
+INDEX=0   # INITIALIZE OVERALL INDEX FOR OUTPUT
+
+# SET LOOP TO INDEX SPEED
+while [ $IS -lt $NS ]
+  do
+    # CALCULATE THE NEW SPEED VALUE TO BE USED IN THE NEXT CALC
+    SPEED[$IS]=`echo "scale=12; ($SMIN+$IS*$DELS)" | bc`
+
+    ID=0  # INITIALIZE DENSITY INDEX
+
+    # SET LOOP TO INDEX DENSITY AND RUN scat_exec
+    while [ $ID -lt $ND ]
+      do
+        # CALCULATE THE APPROPRIATE NUMBER DENSITY VALUE TO BE USED
+        D[$ID]=`echo "scale=12; ($DMIN+$ID*$DELD)" | bc`
+
+        # CREATE THE TEMPORARY INPUT FILE TO BE USED BY scat_exec
+        echo ${D[$ID]} | cat > scat_input_file
+        echo $TEMPERATURE | cat >> scat_input_file
+        echo ${SPEED[$IS]} | cat >> scat_input_file
+        
+         runscat   # RUN scat_exec AND RECIEVE OUTPUT ARRAY 'RATE'
+
+        # CREATE FOUR ARRAYS OF OUTPUT VALUES
+        SLOWING[$INDEX]=${RATE[0]}  # SLOWING
+        TRANS[$INDEX]=${RATE[1]}    # TRANSVERSE DIFF
+        PARA[$INDEX]=${RATE[2]}     # PARALLEL DIFF
+        ELOSS[$INDEX]=${RATE[3]}    # ENERGY LOSS
+
+        # INDEX THE DENSITY VALUES TO BE USED NEXT
+        ID=$(( $ID + 1 ))        
+        # INDEX THE OVERALL OUTPUT VALUE
+        INDEX=$(( $INDEX + 1 ))
+    done
+    # INDEX THE SPEED TO BE CALCULATED AGAIN
+    IS=$(( $IS + 1 ))
+done
+
+# CODE TO WRITE THE HEADER INFORMATION AND FILL EACH FILE WITH 
+# APPROPRIATE FILES. RUNS fill_block AND PIPES OUTPUT INTO EACH FILE.
+
+echo -e "Slowing Rates (1/s) for background temperature $TEMPERATURE eV \n" | cat > "Slowing$TEMPERATURE"
+fill_block SLOWING[@] | cat >> "Slowing$TEMPERATURE"
+
+echo -e "Transverse Diffusion Rates (1/s) for background temperature $TEMPERATURE eV\n" | cat > "Transverse$TEMPERATURE"
+fill_block TRANS[@] | cat >> "Transverse$TEMPERATURE"
+
+echo -e "Parallel Diffusion Rates (1/s) for background temperature $TEMPERATURE eV\n" | cat > "Parallel$TEMPERATURE"
+fill_block PARA[@] | cat >> "Parallel$TEMPERATURE"
+
+echo -e "Energy-Loss Rates (1/s) for background temperature $TEMPERATURE eV\n" | cat > "EnergyLoss$TEMPERATURE"
+fill_block ELOSS[@] | cat >> "EnergyLoss$TEMPERATURE"
+
+echo "Script scat_script is complete."
+exit 0

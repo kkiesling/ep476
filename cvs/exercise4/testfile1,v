@@ -1,0 +1,43 @@
+head     1.1;
+branch   1.1.1;
+access   ;
+symbols  initial:1.1.1.1 kiesling:1.1.1;
+locks    ; strict;
+comment  @# @;
+
+
+1.1
+date     2014.02.05.15.21.13;  author kiesling;  state Exp;
+branches 1.1.1.1;
+next     ;
+commitid        10052F256D5604AA142;
+
+1.1.1.1
+date     2014.02.05.15.21.13;  author kiesling;  state Exp;
+branches ;
+next     ;
+commitid        10052F256D5604AA142;
+
+
+desc
+@@
+
+
+
+1.1
+log
+@Initial revision
+@
+text
+@testfile1
+@
+
+
+1.1.1.1
+log
+@
+ creating the first repo for exercise 4
+
+@
+text
+@@

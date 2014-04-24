@@ -1,0 +1,29 @@
+ &scalar_input
+            elem_chrg =1.6022e-19 
+            electron_mass=9.1094e-31
+            proton_mass=1.6726e-27
+            neutron_mass=1.6750e-27
+            npart = 1
+            t_initial = 0
+            t_final = 1e-4
+            integrator = 'rk2'
+            nstep = 1000000000
+            ex = 400
+            ey = 0
+            ez = -300
+            bx = 0
+            by = 0.01
+            bz = 0                  /
+
+ &vector_input
+            x_init = 0
+            y_init = 0
+            z_init = 0
+            vx_init = 0
+            vy_init = 0
+            vz_init = 100000
+            num_elecs = 0 
+            num_prots = 2
+            num_neuts = 2           /
+
+

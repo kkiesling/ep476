@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# This script moves files and directories specified by the argument
+# list into a directory called trash_dir in the user's home directory.
+# If trash_dir does not exist, create it first.  Also, check if the
+# file or directory being moved already exists in trash_dir.  If so,
+# add a suffix to the name until it doesn't match the contents of
+# trash_dir when being moved.
+
+# This function appends ".1" to its first argument and puts the result
+# in the NEWNAME variable.
+
+addsuf () { NEWNAME="$1.1" ; }
+
+# Check whether trash_dir exists in your home directory.
+
+TRASHPATH=$HOME/trash_dir
+
+if [ ! -d $TRASHPATH ] 
+then
+  if mkdir $TRASHPATH                    #    mkdir returns a 0 if
+  then                                   #    trash_dir has been created.
+    echo '** trash_dir created **'
+  else
+    echo '** trash script unable to create trash_dir **' 
+    exit
+  fi
+fi
+
+# ADD APPROPRIATE LINES TO MAKE YOUR TRASHPATH WRITEABLE.  FOLLOW
+# THE EXAMPLE OF THE mkdir ABOVE TO HANDLE POSSIBLE ERRORS FROM
+# THE chmod COMMAND.
+
+if [ ! -w $TRASHPATH ]
+then
+  if chmod u+w $TRASHPATH
+  then
+    echo '** trash_dir made writeable **'
+  else
+    echo '** unable to make trash_dir writeable **'
+    exit
+  fi
+fi
+
+# Loop through the argument list, moving the files or directories
+# to trash_dir after checking for files of the same name in trash_dir.
+# If the name is a duplicate, use the addsuf function until the name
+# is unique.
+
+for DISCARD in $@
+do
+  TRASHNAME=$DISCARD
+  while [ -e $TRASHPATH/$TRASHNAME ]
+  do
+
+# ADD LINES THAT USE THE addsuf FUNCTION DEFINED ABOVE TO CHANGE
+# TRASHNAME TO SOMETHING THAT DOESN'T EXIST IN TRASHPATH.
+
+    addsuf
+
+# ALSO REMOVE THE FOLLOWING TEMPORARY LINE.
+    echo "$DISCARD already present in trash_dir."; exit
+
+  done
+
+# ADD LINES THAT MOVE THE ITEM IN THE ARGUMENT LIST TO THE MODIFIED
+# TRASHNAME IN TRASHPATH.  WRITE MESSAGES TO STDOUT THAT INDICATE SUCCESS OR 
+# FAILURE OF THE MOVE, AND IF SUCCESSFUL, HOW THE FILE OR DIRECTORY NAMES 
+# APPEAR IN TRASHPATH.
+
+# ALSO REMOVE THE FOLLOWING TEMPORARY LINE.
+    echo "$DISCARD is not present in trash_dir."
+
+done
+
