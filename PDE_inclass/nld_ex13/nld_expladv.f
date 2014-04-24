@@ -23,7 +23,7 @@ C ---------------------------------------------------------------------
 
       ! Calculate next time step and store to a temporary vector
       DO j=1,ncell-1
-            temp_T(j)=temp(j)+dt*kappa(j)/(cvol(j)*dxh(j)**2)*(temp(j-1)
+            temp_T(j)=temp(j)+dt*kappa(j)/(cvol(j)*dx**2)*(temp(j-1)
      $                -2._rknd*temp(j)+temp(j+1))+dt/cvol(j)*src(j)
       END DO
 

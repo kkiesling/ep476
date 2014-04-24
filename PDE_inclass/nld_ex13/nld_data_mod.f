@@ -6,6 +6,8 @@ c=======================================================================
 
       MODULE nld_data_mod
       USE nld_kind_mod
+      USE nld_inp_mod
+      USE nld_io_mod
       IMPLICIT NONE
 
 c-----------------------------------------------------------------------
@@ -18,7 +20,7 @@ c-----------------------------------------------------------------------
 c     Time-step information.
 c-----------------------------------------------------------------------
  
-      REAL(rknd) :: time,dt,dt0
+      REAL(rknd) :: time,dt,dt0,dx
       INTEGER(iknd) :: istep
 
 c-----------------------------------------------------------------------
@@ -49,6 +51,12 @@ c-----------------------------------------------------------------------
       REAL(rknd), DIMENSION(:), POINTER :: dcvol
       REAL(rknd), DIMENSION(:), POINTER :: kappa
       REAL(rknd), DIMENSION(:), POINTER :: dkappa
+
+c-----------------------------------------------------------------------
+C     Source (spacially varying)
+c-----------------------------------------------------------------------
+
+      REAL(rknd), DIMENSION(:), ALLOCATABLE :: src
 
 c-----------------------------------------------------------------------
 c     End of module variables.     
@@ -87,9 +95,11 @@ c     Allocate and fill mesh information.
 c-----------------------------------------------------------------------
 
       ALLOCATE(xvert(0:ncell))
+      
+      dx=xlength/ncell
 
       DO ix=0,ncell
-        xvert(ix)=ix*(xlength/ncell)
+        xvert(ix)=ix*dx   !(xlength/ncell)
       ENDDO
 
 c-----------------------------------------------------------------------
