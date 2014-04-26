@@ -22,6 +22,7 @@ c-----------------------------------------------------------------------
       REAL(rknd) :: csp0=1._rknd      !  spec. heat cap - c
       REAL(rknd) :: rho0=1._rknd      !  mass density - rho
       REAL(rknd) :: thc0=1._rknd      !  thermal conductivity - kappa
+      REAL(rknd) :: u_src=1._rknd
 
 c-----------------------------------------------------------------------
 c     If model is set to "nfuel", the computation has the nonlinear

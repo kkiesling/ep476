@@ -25,7 +25,7 @@ c-----------------------------------------------------------------------
      1                   ncfit,xlength,tinitial,tfinal,
      2                   icc,ics,bc_val0,bc_vall,
      3                   nstep,ncell,adv_type,theta,estab,nl_tol,
-     4                   nl_maxit,newt_start,nplt,src
+     4                   nl_maxit,newt_start,nplt,u_src
 
 c-----------------------------------------------------------------------
 c     Initialize the timer, and set constants.

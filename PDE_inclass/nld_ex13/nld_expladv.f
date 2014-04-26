@@ -15,19 +15,24 @@ C ---------------------------------------------------------------------
       EXTERNAL :: nld_coeff
       REAL(rknd), DIMENSION(0:ncell) :: temp_T
       
+      src=u_src
 
       CALL nld_coeff(.false.) ! false = do not compute derivatives  
       
-      temp_T(0)=temp(0)
-      temp_T(ncell)=temp(ncell)
+      temp_T(0)=bc_val0
+      temp_T(ncell)=bc_vall
 
       ! Calculate next time step and store to a temporary vector
       DO j=1,ncell-1
-            temp_T(j)=temp(j)+dt*kappa(j)/(cvol(j)*dx**2)*(temp(j-1)
-     $                -2._rknd*temp(j)+temp(j+1))+dt/cvol(j)*src(j)
+C            temp_T(j)=temp(j)+dt*kappa(j)/(cvol(j)*dx**2)*(temp(j-1)
+C     $                -2._rknd*temp(j)+temp(j+1))+dt/cvol(j)*src(j)
+
+            temp_T(j)=temp(j)+dt/cvol(j)*(kappa(j)/dx**2*(temp(j-1)-
+     $             2._rknd*temp(j)+temp(j+1))+src(j))
       END DO
 
       temp=temp_T
-      
+      time=time+dt
+
       END SUBROUTINE nld_expladv
 

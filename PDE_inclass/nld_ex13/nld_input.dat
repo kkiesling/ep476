@@ -10,7 +10,7 @@
             ncfit=20
             xlength=1
             tinitial=0
-            tfinal=1
+            tfinal=.3
             icc=0
             ics=0
             bc_val0=0
@@ -24,5 +24,5 @@
             nl_maxit=1000
             newt_start=.1
             nplt=1
-            src=1
+            u_src=1
                   /

@@ -51,12 +51,7 @@ c-----------------------------------------------------------------------
       REAL(rknd), DIMENSION(:), POINTER :: dcvol
       REAL(rknd), DIMENSION(:), POINTER :: kappa
       REAL(rknd), DIMENSION(:), POINTER :: dkappa
-
-c-----------------------------------------------------------------------
-C     Source (spacially varying)
-c-----------------------------------------------------------------------
-
-      REAL(rknd), DIMENSION(:), ALLOCATABLE :: src
+      REAL(rknd), DIMENSION(:), POINTER :: src
 
 c-----------------------------------------------------------------------
 c     End of module variables.     
@@ -86,9 +81,7 @@ c-----------------------------------------------------------------------
 C     Allocate source mesh
 c-----------------------------------------------------------------------
 
-      ALLOCATE(src(0:ncell))
       
-      src=1._rknd
 
 c-----------------------------------------------------------------------
 c     Allocate and fill mesh information.
@@ -163,6 +156,7 @@ c-----------------------------------------------------------------------
       ALLOCATE(dcvol(0:ncell))
       ALLOCATE(kappa(1:ncell))
       ALLOCATE(dkappa(1:ncell))
+      ALLOCATE(src(0:ncell))
 
       RETURN
       END SUBROUTINE nld_data_init
