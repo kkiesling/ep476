@@ -19,6 +19,7 @@ for i=1:nx
     xmesh_data(:,i)=xmesh(i);
 end
 
+figure
 mesh(time_data,xmesh_data,temperature)
 xlabel('time')
 ylabel('x')

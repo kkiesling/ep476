@@ -30,14 +30,15 @@ c-----------------------------------------------------------------------
           dkappa=0._rknd
         ENDIF
 
-C      CASE("nfuel")
-C        DO ix=1,ncell
-C            tcell=.5_rknd*(temp(ix-1)+temp(ix))
-c            cvol=rho0*csp0
-C            kappa(ix)=thc0/(1+tcell*thc1)+thc3*tcell**3 
-C        END DO
-C        CALL nld_interp(ncfit,tcfit(0:ncfit),ccfit(0:ncfit),
-C     &                  ncell+1_iknd,temp,0_iknd,cvol,dcvol)
+      CASE("nfuel")
+        DO ix=1,ncell
+            tcell=.5_rknd*(temp(ix-1)+temp(ix))
+            cvol=rho0*csp0
+            kappa(ix)=thc0/(1+tcell*thc1)+thc3*tcell**3 
+        END DO
+        CALL nld_interp(ncfit,tcfit(0:ncfit),ccfit(0:ncfit),
+     &                  ncell+1_iknd,temp,0_iknd,cvol,dcvol)
+
       CASE DEFAULT
 
         WRITE(*,*) "Model ",TRIM(model)," not recognized."

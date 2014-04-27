@@ -34,8 +34,11 @@ LDRFLAGS =
 
 # Library paths and libraries can be listed here.
 
-LIBDIR = $(HOME)/ep476/PDE_inclass/nld_ex13 
-LIBS = nld
+LIBDIR1 = $(HOME)/ep476/PDE_inclass/nld_ex13 
+LIBS1 = nld
+LIBDIR2 = /usr/lib
+LIBS2 = lapack
+LIBS3 = blas
 
 #-----------------------------------------------------------------------
 
@@ -44,9 +47,11 @@ LIBS = nld
 # that the line is continued.
 
 OBJS = nld_kind_mod.o nld_inp_mod.o nld_io_mod.o nld_data_mod.o \
-       nld_coeff.o nld_expladv.o nld_time.o nldiff.o
+       nld_coeff.o nld_expladv.o nld_time.o nldiff.o nld_impladv.o \
+       nld_interp.o
 
-MODS = nld_kind_mod.mod nld_inp_mod.mod nld_io_mod.mod nld_data_mod.mod
+MODS = nld_kind_mod.mod nld_inp_mod.mod nld_io_mod.mod nld_data_mod.mod \
+       nld_impladv.mod nld_interp.mod
 
 #-----------------------------------------------------------------------
 
@@ -59,7 +64,7 @@ MODS = nld_kind_mod.mod nld_inp_mod.mod nld_io_mod.mod nld_data_mod.mod
 nld_exec : FFLAGS = $(FFLAGS_DBG)
 nld_exec : library
 	@echo "Creating "$@" in directory "$(PWD)"."
-	$(FLDR) -o $@ $(LDRFLAGS) $(OBJS) -L$(LIBDIR) -l$(LIBS)
+	$(FLDR) -o $@ $(LDRFLAGS) $(OBJS) -L$(LIBDIR1) -l$(LIBS1) -L$(LIBDIR2) -l$(LIBS2) -l$(LIBS3)
 
 # The following dependency is similar, but it conditionally
 # replaces the value of FFLAGS with FFLAGS_DBG when
@@ -71,8 +76,8 @@ nld_dbg : $(OBJS)
 	$(FLDR) -o $@ $(LDRFLAGS) $(OBJS) $(LIBDIR) $(LIBS)
 
 library : $(MODS) $(OBJS)
-	ar -r lib$(LIBS).a $(OBJS)
-	ranlib lib$(LIBS).a
+	ar -r lib$(LIBS1).a $(OBJS)
+	ranlib lib$(LIBS1).a
 
 #-----------------------------------------------------------------------
 
@@ -93,6 +98,7 @@ nld_inp_mod.o: nld_kind_mod.mod
 nld_data_mod.o: nld_kind_mod.mod nld_inp_mod.mod
 nld_coeff.o: nld_kind_mod.mod nld_inp_mod.mod nld_data_mod.mod
 nld_expladv.o: nld_kind_mod.mod nld_inp_mod.mod nld_data_mod.mod
+nld_impladv.o: nld_kind_mod.mod nld_inp_mod.mod nld_data_mod.mod
 nld_time.o: nld_kind_mod.mod
 nldiff.o: nld_kind_mod.mod nld_io_mod.mod nld_inp_mod.mod \
           nld_data_mod.mod

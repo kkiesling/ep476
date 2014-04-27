@@ -22,6 +22,7 @@ c-----------------------------------------------------------------------
  
       REAL(rknd) :: time,dt,dt0,dx
       INTEGER(iknd) :: istep
+      LOGICAL :: time_check=.true.
 
 c-----------------------------------------------------------------------
 c     Independent and dependent variable arrays declared as pointers
