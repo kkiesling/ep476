@@ -96,6 +96,10 @@ c-----------------------------------------------------------------------
             
           CALL nld_impladv
 
+        CASE( 'analytic', 'analytical')
+
+          CALL nld_analytic
+
         CASE DEFAULT
 
           WRITE(*,*) 'Note: adv_type ',adv_type,' not found.'

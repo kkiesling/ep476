@@ -48,10 +48,10 @@ LIBS3 = blas
 
 OBJS = nld_kind_mod.o nld_inp_mod.o nld_io_mod.o nld_data_mod.o \
        nld_coeff.o nld_expladv.o nld_time.o nldiff.o nld_impladv.o \
-       nld_interp.o
+       nld_analytic.o
 
 MODS = nld_kind_mod.mod nld_inp_mod.mod nld_io_mod.mod nld_data_mod.mod \
-       nld_impladv.mod nld_interp.mod
+       nld_impladv.mod nld_analytic.mod
 
 #-----------------------------------------------------------------------
 
@@ -102,6 +102,7 @@ nld_impladv.o: nld_kind_mod.mod nld_inp_mod.mod nld_data_mod.mod
 nld_time.o: nld_kind_mod.mod
 nldiff.o: nld_kind_mod.mod nld_io_mod.mod nld_inp_mod.mod \
           nld_data_mod.mod
+nld_analytic.o: nld_kind_mod.mod nld_inp_mod.mod nld_data_mod.mod
 
 #-----------------------------------------------------------------------
 
