@@ -38,11 +38,11 @@ C ---------------------------------------------------------------------
       
       ! Calculate next time step and store to a temporary vector
       DO j=1,ncell-1
-C            temp_T(j)=temp(j)+dt*kappa(j)/(cvol(j)*dx**2)*(temp(j-1)
-C     $                -2._rknd*temp(j)+temp(j+1))+dt/cvol(j)*src(j)
+            temp_T(j)=temp(j)+dt*kappa(j)/(cvol(j)*dx**2)*(temp(j-1)
+     $                -2._rknd*temp(j)+temp(j+1))+dt/cvol(j)*src(j)
 
-            temp_T(j)=temp(j)+dt/cvol(j)*(kappa(j)/dx**2*(temp(j-1)-
-     $             2._rknd*temp(j)+temp(j+1))+src(j))
+C            temp_T(j)=temp(j)+dt/cvol(j)*(kappa(j)/dx**2*(temp(j-1)-
+C     $             2._rknd*temp(j)+temp(j+1))+src(j))
       END DO
 
       temp=temp_T

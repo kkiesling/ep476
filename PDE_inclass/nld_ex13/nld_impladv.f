@@ -15,7 +15,7 @@ C ---------------------------------------------------------------------
 
       INTEGER(iknd) :: i, j
       EXTERNAL :: nld_coeff
-      REAL(rknd), DIMENSION(0:ncell) :: BB
+      REAL(rknd), DIMENSION(1:ncell+1) :: BB
       REAL(rknd), DIMENSION(0:ncell,0:ncell) :: AA
       REAL(rknd), DIMENSION(1:ncell+1) :: D
       REAL(rknd), DIMENSION(1:ncell) :: E
@@ -40,25 +40,25 @@ C ---------------------------------------------------------------------
 
       DO j=0,ncell
             IF (j==0) THEN
-                  BB(j)=temp(0)
+                  BB(j+1)=temp(0)
                   AA(j,j)=1._rknd
             ELSEIF (j==1) THEN
                   eta=theta*kappa(j)*dt/(cvol(j)*dx**2)
-                  BB(j)=rhs(j)+eta*temp(0)
+                  BB(j+1)=rhs(j)+eta*temp(0)
                   AA(j,j)=1._rknd+2._rknd*eta
             ELSEIF (j==ncell-1) THEN
                   eta=theta*kappa(j)*dt/(cvol(j)*dx**2)
-                  BB(j)=rhs(j)-eta*temp(ncell)
+                  BB(j+1)=rhs(j)+eta*temp(ncell)
                   AA(j,j)=1._rknd+2._rknd*eta
                   AA(j,j-1)=-eta
             ELSEIF (j==ncell) THEN
                   eta=theta*kappa(j)*dt/(cvol(j)*dx**2)
-                  BB(j)=temp(ncell)
+                  BB(j+1)=temp(ncell)
                   AA(j,j)=1._rknd+2._rknd*eta
                   AA(j,j-1)=-eta
             ELSE
                   eta=theta*kappa(j)*dt/(cvol(j)*dx**2)
-                  BB(j)=rhs(j)
+                  BB(j+1)=rhs(j)
                   AA(j,j)=1._rknd+2._rknd*eta
                   AA(j,j-1)=-eta
             END IF 
@@ -73,10 +73,11 @@ C       DPTSV(N,NRHS,D,E,B,LDB,INFO)
 
       E=0._rknd
       DO i=1,ncell
-            E(i)=AA(i-1,i)
+            E(i)=AA(i,i-1)
       END DO
 
-      CALL DPTSV(ncell+1,1,D,E,BB,ncell+1,INFO)
+
+      CALL DPTSV(ncell,1,D,E,BB,ncell,INFO)
 
       temp=BB
 
